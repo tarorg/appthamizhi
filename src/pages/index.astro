@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Feed from '../components/Feed.astro';
+import AIChat from '../components/AIChat.astro';
+import Collections from '../components/Collections.astro';
+---
+
+<Layout title="Journalism App">
+  <Header />
+  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <Feed />
+    <AIChat />
+    <Collections />
+  </main>
+</Layout>
+
+<style>
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 100%;
+    max-width: 1200px;
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+</style>
