@@ -4,7 +4,12 @@ declare module '@nhost/nhost-js' {
     auth: {
       isAuthenticatedAsync(): Promise<boolean>;
       signOut(): Promise<void>;
-      signIn(options: { provider: string }): Promise<void>;
+      signIn(options: { provider: string }): Promise<{
+        session: any;
+        error: Error | null;
+      }>;
+      onAuthStateChanged(callback: (event: 'SIGNED_IN' | 'SIGNED_OUT', session: any) => void): () => void;
+      getUser(): Promise<any>; // Add this line
     };
   }
 }

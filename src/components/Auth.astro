@@ -1,10 +1,5 @@
 ---
-import { NhostClient } from '@nhost/nhost-js';
-
-const nhost = new NhostClient({
-  subdomain: 'vpgocetcazniqixfdeje',
-  region: 'ap-southeast-1'
-});
+import nhost from '../lib/nhost';
 
 const isAuthenticated = await nhost.auth.isAuthenticatedAsync();
 ---
@@ -21,27 +16,55 @@ const isAuthenticated = await nhost.auth.isAuthenticatedAsync();
 </button>
 
 <script>
-  import { NhostClient } from '@nhost/nhost-js';
-
-  const nhost = new NhostClient({
-    subdomain: 'vpgocetcazniqixfdeje',
-    region: 'ap-southeast-1'
-  });
+  import nhost from '../lib/nhost';
 
   const authButton = document.getElementById('authButton');
+  let isAuthenticated = false;
+
+  async function updateAuthState() {
+    isAuthenticated = await nhost.auth.isAuthenticatedAsync();
+    if (authButton) {
+      const span = authButton.querySelector('span');
+      if (span) {
+        span.textContent = isAuthenticated ? 'Sign Out' : 'Sign in with Google';
+      }
+    }
+  }
+
+  async function handleAuthFlow() {
+    const url = new URL(window.location.href);
+    const refreshToken = url.searchParams.get('refreshToken');
+
+    if (refreshToken) {
+      url.searchParams.delete('refreshToken');
+      window.history.replaceState({}, document.title, url.toString());
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    await updateAuthState();
+  }
+
+  // Run the auth flow immediately
+  handleAuthFlow();
+
+  nhost.auth.onAuthStateChanged((event, session) => {
+    updateAuthState();
+  });
 
   if (authButton) {
     authButton.addEventListener('click', async () => {
-      const isAuthenticated = await nhost.auth.isAuthenticatedAsync();
       if (isAuthenticated) {
-        await nhost.auth.signOut();
-        authButton.querySelector('span').textContent = 'Sign in with Google';
+        try {
+          await nhost.auth.signOut();
+          updateAuthState();
+        } catch (error) {
+          console.error('Error signing out:', error);
+        }
       } else {
         try {
           await nhost.auth.signIn({
             provider: 'google'
           });
-          authButton.querySelector('span').textContent = 'Sign Out';
         } catch (error) {
           console.error('Error signing in:', error);
         }
