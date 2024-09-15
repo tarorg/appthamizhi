@@ -10,6 +10,9 @@ export default defineConfig({
       alias: {
         '@': '/src'
       }
-    }
+    },
+    define: {
+      'import.meta.env.PUBLIC_R2_DOMAIN': JSON.stringify(process.env.PUBLIC_R2_DOMAIN),
+    },
   }
 });

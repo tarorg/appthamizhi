@@ -119,7 +119,16 @@ import Layout from '../layouts/Layout.astro';
       delimiter: Delimiter,
       inlineCode: InlineCode,
       linkTool: LinkTool,
-      image: ImageTool,
+      image: {
+        class: ImageTool,
+        config: {
+          uploader: {
+            uploadByFile(file: File) {
+              return uploadToR2(file);
+            },
+          },
+        },
+      },
       embed: {
         class: Embed,
         config: {
@@ -198,16 +207,50 @@ import Layout from '../layouts/Layout.astro';
   const featureImageInput = document.getElementById('feature-image');
   const imagePreview = document.getElementById('imagePreview');
 
-  featureImageInput?.addEventListener('change', (event) => {
+  featureImageInput?.addEventListener('change', async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file && imagePreview) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        imagePreview.innerHTML = `<img src="${e.target?.result}" alt="Feature Image Preview" class="w-full h-full object-cover rounded-md">`;
-      };
-      reader.readAsDataURL(file);
+      try {
+        const result = await uploadToR2(file);
+        imagePreview.innerHTML = `<img src="${result.file.url}" alt="Feature Image Preview" class="w-full h-full object-cover rounded-md">`;
+      } catch (error) {
+        console.error('Error uploading feature image:', error);
+        alert('Failed to upload feature image');
+      }
     }
   });
+
+  async function uploadToR2(file: File) {
+    const filename = `${Date.now()}-${file.name}`;
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, contentType: file.type }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get signed URL');
+    }
+
+    const { signedUrl } = await response.json();
+
+    const uploadResponse = await fetch(signedUrl, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload file');
+    }
+
+    return {
+      success: 1,
+      file: {
+        url: `https://${import.meta.env.PUBLIC_R2_DOMAIN}/${filename}`,
+      },
+    };
+  }
 </script>
 
 <style>
