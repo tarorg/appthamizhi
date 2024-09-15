@@ -3,49 +3,75 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Create Post">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-      <input type="text" name="title" id="title" placeholder="Post Title" required class="w-full text-4xl font-bold border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none pb-2">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+    <div class="mb-8 pl-[30px]">
+      <input type="text" name="title" id="title" placeholder="Your post title" required class="w-full text-4xl font-bold border-none focus:ring-0 focus:outline-none bg-transparent placeholder-gray-300">
     </div>
 
-    <div class="flex space-x-8 mb-8">
-      <div class="w-1/3">
-        <h2 class="text-xl font-semibold mb-4">Additional Media</h2>
-        <div class="space-y-4">
-          <div>
-            <label for="feature-image" class="block text-sm font-medium text-gray-700">Feature Image</label>
-            <input type="file" name="feature-image" id="feature-image" accept="image/*" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          </div>
-          <div>
-            <label for="media" class="block text-sm font-medium text-gray-700">Other Media</label>
-            <input type="file" name="media" accept="image/*,audio/*,video/*,.pdf" multiple class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          </div>
-        </div>
-      </div>
-      <div class="w-2/3">
-        <button id="togglePanel" class="mb-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-          Toggle Metadata Panel
-        </button>
-      </div>
-    </div>
+    <div id="editorjs" class="prose max-w-none pl-[30px]"></div>
 
-    <div id="editorjs" class="w-full border border-gray-300 rounded-md min-h-[500px] p-4"></div>
+    <button id="openPanel" class="fixed top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
 
     <div id="sidePanel" class="fixed top-0 right-0 w-96 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+      <button id="closePanel" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
       <form class="p-6 space-y-6">
-        <input type="text" name="tags" id="tags" placeholder="Add tags..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        <div>
+          <label for="feature-image" class="block text-sm font-medium text-gray-700 mb-2">Feature Image</label>
+          <div class="flex items-center space-x-4">
+            <div id="imagePreview" class="w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input type="file" name="feature-image" id="feature-image" accept="image/*" class="hidden">
+            <label for="feature-image" class="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Choose Image
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+          <input type="text" name="tags" id="tags" placeholder="Add tags..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
         
-        <input type="text" name="collection" id="collection" placeholder="Collection" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        <div>
+          <label for="collection" class="block text-sm font-medium text-gray-700 mb-2">Collection</label>
+          <input type="text" name="collection" id="collection" placeholder="Collection" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
 
-        <textarea name="excerpt" id="excerpt" rows="3" placeholder="Excerpt" class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        <div>
+          <label for="excerpt" class="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
+          <textarea name="excerpt" id="excerpt" rows="3" placeholder="Brief summary of your post" class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
 
-        <textarea name="metadata" id="metadata" rows="3" placeholder="SEO Description" class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        <div>
+          <label for="metadata" class="block text-sm font-medium text-gray-700 mb-2">SEO Description</label>
+          <textarea name="metadata" id="metadata" rows="3" placeholder="SEO description for search engines" class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
 
-        <input type="datetime-local" name="datetime" id="datetime" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        <div>
+          <label for="datetime" class="block text-sm font-medium text-gray-700 mb-2">Publish Date</label>
+          <input type="datetime-local" name="datetime" id="datetime" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
 
-        <input type="text" name="authors" id="authors" placeholder="Authors (comma-separated)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        <div>
+          <label for="authors" class="block text-sm font-medium text-gray-700 mb-2">Authors</label>
+          <input type="text" name="authors" id="authors" placeholder="Authors (comma-separated)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
 
-        <input type="text" name="location" id="location" placeholder="Location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        <div>
+          <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+          <input type="text" name="location" id="location" placeholder="Location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
 
         <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           Publish
@@ -77,81 +103,82 @@ import Layout from '../layouts/Layout.astro';
     tools: {
       header: {
         class: Header,
-        inlineToolbar: ['marker', 'link'],
         config: {
           placeholder: 'Enter a header',
-          levels: [2, 3, 4],
-          defaultLevel: 3
+          levels: [1, 2, 3, 4, 5, 6],
+          defaultLevel: 3,
+          shortcut: 'CMD+SHIFT+H'
         }
       },
-      list: {
-        class: List,
-        inlineToolbar: true,
-        config: {
-          defaultStyle: 'unordered'
-        }
-      },
-      checklist: {
-        class: Checklist,
-        inlineToolbar: true,
-      },
-      quote: {
-        class: Quote,
-        inlineToolbar: true,
-        config: {
-          quotePlaceholder: 'Enter a quote',
-          captionPlaceholder: 'Quote\'s author',
-        },
-      },
+      list: List,
+      checklist: Checklist,
+      quote: Quote,
       warning: Warning,
-      marker: {
-        class: Marker,
-        shortcut: 'CMD+SHIFT+M',
-      },
-      code: {
-        class: CodeTool,
-        shortcut: 'CMD+SHIFT+C'
-      },
+      marker: Marker,
+      code: CodeTool,
       delimiter: Delimiter,
-      inlineCode: {
-        class: InlineCode,
-        shortcut: 'CMD+SHIFT+C'
-      },
+      inlineCode: InlineCode,
       linkTool: LinkTool,
-      image: {
-        class: ImageTool,
-        config: {
-          endpoints: {
-            byFile: 'http://localhost:8080/uploadFile', // Replace with your image upload endpoint
-            byUrl: 'http://localhost:8080/fetchUrl', // Replace with your image fetch endpoint
-          }
-        }
-      },
+      image: ImageTool,
       embed: {
         class: Embed,
         config: {
           services: {
             youtube: true,
-            coub: true,
+            twitter: {
+              regex: /^https?:\/\/(twitter\.com|x\.com)\/(?:#!\/)?(\w+)\/status(es)?\/(\d+)/,
+              embedUrl: 'https://platform.twitter.com/embed/Tweet.html?id=<%= remote_id %>',
+              html: '<blockquote class="twitter-tweet" data-dnt="true"><a href="<%= url %>"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"><\/script>',
+              height: 'auto',
+              width: '100%',
+              id: (matches: string[]) => matches[matches.length - 1],
+            },
+            instagram: {
+              regex: /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com|instagr\.am)\/(?:p|reel)\/([A-Za-z0-9-_]+)/,
+              embedUrl: 'https://www.instagram.com/p/<%= remote_id %>/embed',
+              html: '<iframe width="400" height="505" style="border: none; overflow: hidden;" src="<%= embedUrl %>"></iframe>',
+              height: 505,
+              width: 400,
+              id: (matches: string[]) => matches[1],
+            },
+            spotify: {
+              regex: /https:\/\/open\.spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/,
+              embedUrl: 'https://open.spotify.com/embed/<%= remote_id %>',
+              html: '<iframe style="border-radius:12px" src="<%= embedUrl %>" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+              height: 352,
+              width: '100%',
+              id: (matches: string[]) => `${matches[1]}/${matches[2]}`,
+            },
           }
         }
       },
-      table: {
-        class: Table,
-        inlineToolbar: true,
-        config: {
-          rows: 2,
-          cols: 3,
-        },
-      },
+      table: Table,
+    },
+    onChange: (api: EditorJS, event: CustomEvent) => {
+      console.log('Editor content changed:', event);
+    },
+    onReady: () => {
+      console.log('Editor.js is ready to work!');
     },
   });
 
-  const togglePanel = document.getElementById('togglePanel');
+  // Add this debugging code
+  editor.isReady.then(() => {
+    const embedTool = editor.blocks.getBlocksCount();
+    console.log('Number of blocks:', embedTool);
+    console.log('Embed tool configuration:', editor.configuration.tools.embed);
+  });
+
+  const openPanel = document.getElementById('openPanel');
+  const closePanel = document.getElementById('closePanel');
   const sidePanel = document.getElementById('sidePanel');
 
-  togglePanel?.addEventListener('click', () => {
-    sidePanel?.classList.toggle('translate-x-full');
+  openPanel?.addEventListener('click', () => {
+    sidePanel?.classList.remove('translate-x-full');
+  });
+
+  closePanel?.addEventListener('click', () => {
+    sidePanel?.classList.add('translate-x-full');
   });
 
   // Handle form submission
@@ -166,11 +193,71 @@ import Layout from '../layouts/Layout.astro';
     
     // Implement your post submission logic here
   });
+
+  // Handle feature image preview
+  const featureImageInput = document.getElementById('feature-image');
+  const imagePreview = document.getElementById('imagePreview');
+
+  featureImageInput?.addEventListener('change', (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file && imagePreview) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview.innerHTML = `<img src="${e.target?.result}" alt="Feature Image Preview" class="w-full h-full object-cover rounded-md">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 </script>
 
 <style>
-  /* Add any additional styles here */
   .prose {
     max-width: none;
+  }
+
+  /* Add custom styles for Editor.js to ensure consistent left alignment */
+  :global(.ce-block__content) {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  :global(.ce-toolbar__content) {
+    max-width: none;
+    margin-left: -30px; /* Adjusted to match the new padding */
+  }
+
+  /* Add styles for different header levels */
+  :global(.ce-header[contenteditable][data-placeholder]:empty::before) {
+    color: #707684;
+  }
+
+  :global(h1.ce-header) {
+    font-size: 2.5em;
+    font-weight: bold;
+  }
+
+  :global(h2.ce-header) {
+    font-size: 2em;
+    font-weight: bold;
+  }
+
+  :global(h3.ce-header) {
+    font-size: 1.75em;
+    font-weight: bold;
+  }
+
+  :global(h4.ce-header) {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  :global(h5.ce-header) {
+    font-size: 1.25em;
+    font-weight: bold;
+  }
+
+  :global(h6.ce-header) {
+    font-size: 1em;
+    font-weight: bold;
   }
 </style>

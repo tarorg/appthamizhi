@@ -5,5 +5,6 @@
     "allowJs": true,
     "jsx": "preserve",
     "jsxImportSource": "astro"
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.astro"]
 }
