@@ -3,6 +3,105 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Create Post">
-  <h1>Create Post</h1>
-  <!-- Add post creation form with all required fields -->
+  <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold mb-6">Create Post</h1>
+    <form class="space-y-6">
+      <div>
+        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+        <input type="text" name="title" id="title" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      </div>
+      
+      <div>
+        <label for="datetime" class="block text-sm font-medium text-gray-700">Date and Time</label>
+        <input type="datetime-local" name="datetime" id="datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      </div>
+      
+      <div>
+        <label for="collection" class="block text-sm font-medium text-gray-700">Collection</label>
+        <input type="text" name="collection" id="collection" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      </div>
+      
+      <div>
+        <label for="tags" class="block text-sm font-medium text-gray-700">Tags (comma-separated)</label>
+        <input type="text" name="tags" id="tags" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      </div>
+      
+      <div>
+        <label for="authors" class="block text-sm font-medium text-gray-700">Authors (comma-separated)</label>
+        <input type="text" name="authors" id="authors" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      </div>
+      
+      <div>
+        <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+        <input type="text" name="location" id="location" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+      </div>
+      
+      <div>
+        <label for="feature-image" class="block text-sm font-medium text-gray-700">Feature Image</label>
+        <input type="file" name="feature-image" id="feature-image" accept="image/*" class="mt-1 block w-full">
+      </div>
+      
+      <div>
+        <label for="excerpt" class="block text-sm font-medium text-gray-700">Excerpt</label>
+        <textarea name="excerpt" id="excerpt" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+      </div>
+      
+      <div>
+        <label for="metadata" class="block text-sm font-medium text-gray-700">Google Metadata Card</label>
+        <textarea name="metadata" id="metadata" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Media Upload</label>
+        <input type="file" name="media" accept="image/*,audio/*,video/*,.pdf" multiple class="mt-1 block w-full">
+      </div>
+      
+      <div>
+        <label for="editor" class="block text-sm font-medium text-gray-700">Notes</label>
+        <div id="editorjs" class="mt-1 block w-full border border-gray-300 rounded-md min-h-[300px]"></div>
+      </div>
+      
+      <div>
+        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Publish Post
+        </button>
+      </div>
+    </form>
+  </div>
 </Layout>
+
+<script>
+  import EditorJS from '@editorjs/editorjs';
+  import Header from '@editorjs/header';
+  import List from '@editorjs/list';
+  import Checklist from '@editorjs/checklist';
+  import Quote from '@editorjs/quote';
+  import ImageTool from '@editorjs/image';
+  import Embed from '@editorjs/embed';
+
+  const editor = new EditorJS({
+    holder: 'editorjs',
+    tools: {
+      header: Header,
+      list: List,
+      checklist: Checklist,
+      quote: Quote,
+      image: ImageTool,
+      embed: Embed
+    },
+    placeholder: 'Start writing your notes here...'
+  });
+
+  // Handle form submission
+  const form = document.querySelector('form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const editorData = await editor.save();
+    
+    // Here you would typically send the form data and editor content to your server
+    console.log('Form data:', new FormData(form));
+    console.log('Editor data:', editorData);
+    
+    // Implement your post submission logic here
+  });
+</script>

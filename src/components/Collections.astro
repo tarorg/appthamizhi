@@ -1,7 +1,20 @@
-<section id="collections">
-  <h2>Collections</h2>
-  <!-- Display user's collections -->
-  <div class="profile-icon">
-    <!-- Add profile icon/image -->
+---
+// No need to import Image or createPostIcon anymore
+---
+
+<section id="collections" class="bg-white shadow rounded-lg p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-2xl font-bold">collections</h2>
+    <a href="/create-post" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      Create Post
+    </a>
+  </div>
+  <div class="space-y-4">
+    <p>Your collections will be displayed here.</p>
+    <!-- Add your collections content here -->
   </div>
 </section>
+
+<style>
+  /* Add any additional styles here */
+</style>
