@@ -1,0 +1,119 @@
+---
+interface Message {
+  role: 'user' | 'assistant' | 'error';
+  content: string;
+}
+
+let messages: Message[] = [];
+---
+
+<div id="thamizhi" class="hidden flex flex-col h-full bg-gray-50">
+  <div class="flex-1 flex flex-col justify-end overflow-y-auto p-4" id="chat-messages">
+    <div class="space-y-4">
+      {messages.map((message) => (
+        <div class={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div class={`max-w-3/4 p-3 rounded-lg ${
+            message.role === 'user' 
+              ? 'bg-blue-500 text-white' 
+              : message.role === 'error'
+              ? 'bg-red-500 text-white'
+              : 'bg-white text-gray-800 shadow-md'
+          }`}>
+            {message.content}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <div class="p-4 bg-white border-t">
+    <div class="flex space-x-2 max-w-4xl mx-auto">
+      <input
+        type="text"
+        id="chat-input"
+        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Ask anything..."
+      />
+      <button id="send-button" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  console.log('ThamizhiChat component loaded');
+  interface Message {
+    role: 'user' | 'assistant' | 'error';
+    content: string;
+  }
+
+  let messages: Message[] = [];
+  const chatMessages = document.getElementById('chat-messages') as HTMLDivElement | null;
+  const chatInput = document.getElementById('chat-input') as HTMLInputElement | null;
+  const sendButton = document.getElementById('send-button') as HTMLButtonElement | null;
+
+  async function sendMessage() {
+    if (!chatInput || !chatInput.value.trim()) return;
+
+    const input = chatInput.value.trim();
+    const userMessage: Message = { role: 'user', content: input };
+    messages.push(userMessage);
+    chatInput.value = '';
+    updateChatUI();
+
+    try {
+      const response = await fetch('/api/groq-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: messages.filter(m => m.role !== 'error') }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Failed to get response from Groq');
+      }
+
+      if (!data.reply) {
+        throw new Error('Empty response from Groq');
+      }
+
+      const assistantMessage: Message = { role: 'assistant', content: data.reply };
+      messages.push(assistantMessage);
+    } catch (error) {
+      console.error('Error in chat:', error);
+      const errorMessage: Message = { role: 'error', content: `Error: ${error instanceof Error ? error.message : String(error)}` };
+      messages.push(errorMessage);
+    } finally {
+      updateChatUI();
+    }
+  }
+
+  function updateChatUI() {
+    if (!chatMessages) return;
+
+    const messagesHTML = messages.map((message) => `
+      <div class="flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}">
+        <div class="max-w-3/4 p-3 rounded-lg ${
+          message.role === 'user' 
+            ? 'bg-blue-500 text-white' 
+            : message.role === 'error'
+            ? 'bg-red-500 text-white'
+            : 'bg-white text-gray-800 shadow-md'
+        }">
+          ${message.content}
+        </div>
+      </div>
+    `).join('');
+
+    chatMessages.innerHTML = `<div class="space-y-4">${messagesHTML}</div>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  sendButton?.addEventListener('click', sendMessage);
+  chatInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
+</script>
