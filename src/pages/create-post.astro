@@ -124,7 +124,17 @@ import Layout from '../layouts/Layout.astro';
         config: {
           uploader: {
             uploadByFile(file: File) {
-              return uploadToR2(file);
+              console.log('Uploading file in ImageTool:', file);
+              return uploadToR2(file).catch(error => {
+                console.error('Error in ImageTool uploader:', error);
+                alert(`Failed to upload image: ${error.message}`);
+                return {
+                  success: 0,
+                  file: {
+                    url: '',
+                  },
+                };
+              });
             },
           },
         },
@@ -163,7 +173,7 @@ import Layout from '../layouts/Layout.astro';
       },
       table: Table,
     },
-    onChange: (api: EditorJS, event: CustomEvent) => {
+    onChange: (api: any, event: CustomEvent) => {
       console.log('Editor content changed:', event);
     },
     onReady: () => {
@@ -213,43 +223,80 @@ import Layout from '../layouts/Layout.astro';
       try {
         const result = await uploadToR2(file);
         imagePreview.innerHTML = `<img src="${result.file.url}" alt="Feature Image Preview" class="w-full h-full object-cover rounded-md">`;
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error uploading feature image:', error);
-        alert('Failed to upload feature image');
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        alert(`Failed to upload feature image: ${errorMessage}`);
+        imagePreview.innerHTML = `<p class="text-red-500 text-sm">Failed to upload image</p>`;
       }
     }
   });
 
   async function uploadToR2(file: File) {
-    const filename = `${Date.now()}-${file.name}`;
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename, contentType: file.type }),
-    });
+    try {
+      const filename = `${Date.now()}-${file.name}`;
+      console.log('Uploading file:', filename);
 
-    if (!response.ok) {
-      throw new Error('Failed to get signed URL');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('filename', filename);
+      formData.append('contentType', file.type);
+
+      console.log('FormData:', Object.fromEntries(formData.entries()));
+
+      const response = await fetch('/api/test', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const responseData = await response.json();
+      console.log('API response:', responseData);
+
+      if (!response.ok) {
+        throw new Error(`Failed to get signed URL: ${responseData.error || response.statusText}`);
+      }
+
+      const { signedUrl, publicUrl } = responseData;
+      console.log('Received signed URL:', signedUrl);
+      console.log('Public URL:', publicUrl);
+
+      // Perform the actual file upload using the signed URL
+      const uploadResponse = await fetch(signedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+
+      console.log('Upload response status:', uploadResponse.status);
+      console.log('Upload response headers:', Object.fromEntries(uploadResponse.headers.entries()));
+
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        throw new Error(`Failed to upload file: ${uploadResponse.statusText}. Error: ${errorText}`);
+      }
+
+      console.log('File uploaded successfully');
+
+      // Verify if the file is accessible
+      const checkResponse = await fetch(publicUrl, { method: 'HEAD' });
+      console.log('Check response status:', checkResponse.status);
+
+      if (!checkResponse.ok) {
+        throw new Error(`File not accessible after upload. Status: ${checkResponse.status}`);
+      }
+
+      return {
+        success: 1,
+        file: {
+          url: publicUrl,
+        },
+      };
+    } catch (error) {
+      console.error('Error in uploadToR2:', error);
+      throw error;
     }
-
-    const { signedUrl } = await response.json();
-
-    const uploadResponse = await fetch(signedUrl, {
-      method: 'PUT',
-      body: file,
-      headers: { 'Content-Type': file.type },
-    });
-
-    if (!uploadResponse.ok) {
-      throw new Error('Failed to upload file');
-    }
-
-    return {
-      success: 1,
-      file: {
-        url: `https://${import.meta.env.PUBLIC_R2_DOMAIN}/${filename}`,
-      },
-    };
   }
 </script>
 
