@@ -9,15 +9,57 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
   <div class="flex h-screen bg-white">
     <!-- Editor Section -->
     <div class="flex-1 flex flex-col overflow-hidden">
-      <header class="py-4 px-6 border-b">
+      <header class="py-4 px-6 border-b flex justify-between items-center">
         <input type="text" name="title" id="title" placeholder="Post Title" class="w-full text-4xl font-bold border-none focus:ring-0 focus:outline-none" />
+        <button id="toggleSettings" class="md:hidden bg-gray-200 p-2 rounded-md shadow-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
       </header>
-      <div id="editorjs" class="flex-1 overflow-y-auto px-6 py-4"></div>
+      
+      <div class="flex-1 overflow-y-auto">
+        <!-- Media Section -->
+        <div class="px-6 pt-4">
+          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Media</h3>
+          <div id="mediaUploadArea" class="w-full aspect-video bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p class="text-sm text-gray-500">Drag and drop your media here, or <span class="text-indigo-600 font-medium">browse</span></p>
+            <p class="text-xs text-gray-400 mt-1">Supports video, audio, and PDF files</p>
+          </div>
+          <input type="file" name="media-file" id="media-file" accept="video/*,audio/*,application/pdf" class="hidden">
+          <div id="mediaPreview" class="mt-4 hidden w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"></div>
+          <div id="uploadControls" class="flex items-center justify-between mt-4">
+            <span id="selected-file" class="text-sm text-gray-500">No file selected</span>
+            <button id="upload-media" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              Upload
+            </button>
+          </div>
+          <!-- Progress bar -->
+          <div id="upload-progress" class="w-full bg-gray-200 rounded-full h-2 mt-4 hidden">
+            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="px-6 pt-4 text-sm text-gray-500 font-medium">Notes</div>
+        <div id="editorjs" class="px-6 py-2"></div>
+      </div>
     </div>
 
     <!-- Settings Panel -->
-    <div class="w-96 bg-gray-100 border-l overflow-y-auto">
+    <div id="settingsPanel" class="w-96 bg-gray-100 border-l overflow-y-auto transition-transform duration-300 ease-in-out transform md:translate-x-0 translate-x-full fixed top-0 right-0 bottom-0 z-50 md:relative">
       <div class="p-6 space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-semibold text-gray-900">Settings</h2>
+          <button id="closeSettings" class="md:hidden text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
         <div>
           <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Feature Image</h3>
           <div id="imagePreview" class="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center mb-2 cursor-pointer">
@@ -95,6 +137,7 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
   const editor = new EditorJS({
     holder: 'editorjs',
     placeholder: 'Start writing your post...',
+    minHeight: 0, // This allows the editor to shrink when empty
     tools: {
       header: {
         class: Header,
@@ -254,7 +297,7 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
     }
   });
 
-  async function uploadToR2(file: File) {
+  async function uploadToR2(file: File, progressCallback?: (progress: number) => void) {
     try {
       const filename = `${Date.now()}-${file.name}`;
       console.log('Uploading file:', filename);
@@ -320,31 +363,217 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
       throw error;
     }
   }
+
+  // Modify the toggle functionality
+  const toggleButton = document.getElementById('toggleSettings');
+  const closeButton = document.getElementById('closeSettings');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const editorSection = document.querySelector('.flex-1.flex.flex-col.overflow-hidden');
+
+  function togglePanel() {
+    settingsPanel?.classList.toggle('translate-x-full');
+    if (window.innerWidth < 768) { // md breakpoint
+      editorSection?.classList.toggle('hidden');
+    }
+  }
+
+  toggleButton?.addEventListener('click', togglePanel);
+  closeButton?.addEventListener('click', togglePanel);
+
+  // Handle resize
+  function handleResize() {
+    if (window.innerWidth >= 768) { // md breakpoint
+      settingsPanel?.classList.remove('translate-x-full');
+      editorSection?.classList.remove('hidden');
+    } else {
+      settingsPanel?.classList.add('translate-x-full');
+      editorSection?.classList.remove('hidden');
+    }
+  }
+
+  window.addEventListener('resize', handleResize);
+  handleResize(); // Initial call
+
+  // Media file handling
+  const mediaUploadArea = document.getElementById('mediaUploadArea');
+  const mediaFileInput = document.getElementById('media-file') as HTMLInputElement;
+  const mediaPreview = document.getElementById('mediaPreview');
+  const uploadControls = document.getElementById('uploadControls');
+  const selectedFileSpan = document.getElementById('selected-file');
+  const uploadMediaButton = document.getElementById('upload-media') as HTMLButtonElement;
+  const uploadProgressBar = document.getElementById('upload-progress');
+  const uploadProgressBarFill = uploadProgressBar?.querySelector('div');
+
+  mediaUploadArea?.addEventListener('click', () => {
+    mediaFileInput?.click();
+  });
+
+  mediaUploadArea?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    mediaUploadArea.classList.add('bg-gray-50');
+  });
+
+  mediaUploadArea?.addEventListener('dragleave', () => {
+    mediaUploadArea.classList.remove('bg-gray-50');
+  });
+
+  mediaUploadArea?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    mediaUploadArea.classList.remove('bg-gray-50');
+    if (e.dataTransfer?.files.length) {
+      mediaFileInput.files = e.dataTransfer.files;
+      handleFileSelection();
+    }
+  });
+
+  function handleFileSelection() {
+    const file = mediaFileInput?.files?.[0];
+    if (file && selectedFileSpan && uploadMediaButton) {
+      selectedFileSpan.textContent = file.name;
+      previewMedia(file);
+      mediaUploadArea?.classList.add('hidden');
+      mediaPreview?.classList.remove('hidden');
+      uploadMediaButton.disabled = false;
+      uploadControls?.classList.remove('hidden');
+    } else if (selectedFileSpan && uploadMediaButton) {
+      selectedFileSpan.textContent = 'No file selected';
+      mediaUploadArea?.classList.remove('hidden');
+      mediaPreview?.classList.add('hidden');
+      uploadMediaButton.disabled = true;
+    }
+  }
+
+  mediaFileInput?.addEventListener('change', handleFileSelection);
+
+  function previewMedia(file: File) {
+    if (!mediaPreview) return;
+
+    const fileType = file.type.split('/')[0];
+    let previewElement: HTMLElement;
+
+    switch (fileType) {
+      case 'video':
+        previewElement = document.createElement('video');
+        (previewElement as HTMLVideoElement).src = URL.createObjectURL(file);
+        previewElement.className = 'w-full h-full object-cover';
+        (previewElement as HTMLVideoElement).controls = true;
+        (previewElement as HTMLVideoElement).autoplay = true;
+        (previewElement as HTMLVideoElement).loop = true;
+        (previewElement as HTMLVideoElement).muted = true;
+        break;
+      case 'audio':
+        previewElement = document.createElement('div');
+        previewElement.className = 'w-full h-full bg-gray-100 flex items-center justify-center';
+        const audio = document.createElement('audio') as HTMLAudioElement;
+        audio.src = URL.createObjectURL(file);
+        audio.className = 'w-full max-w-md';
+        audio.controls = true;
+        previewElement.appendChild(audio);
+        break;
+      case 'application':
+        if (file.type === 'application/pdf') {
+          previewElement = document.createElement('div');
+          previewElement.className = 'w-full h-full bg-gray-100 flex items-center justify-center';
+          const pdfIcon = document.createElement('div');
+          pdfIcon.className = 'text-6xl text-gray-400';
+          pdfIcon.innerHTML = '📄';
+          const pdfText = document.createElement('div');
+          pdfText.className = 'mt-2 text-gray-600';
+          pdfText.textContent = file.name;
+          previewElement.appendChild(pdfIcon);
+          previewElement.appendChild(pdfText);
+        } else {
+          previewElement = document.createElement('div');
+          previewElement.className = 'w-full h-full flex items-center justify-center text-gray-500';
+          previewElement.textContent = 'Preview not available for this file type';
+        }
+        break;
+      default:
+        previewElement = document.createElement('div');
+        previewElement.className = 'w-full h-full flex items-center justify-center text-gray-500';
+        previewElement.textContent = 'Preview not available for this file type';
+    }
+
+    mediaPreview.innerHTML = '';
+    mediaPreview.appendChild(previewElement);
+  }
+
+  uploadMediaButton?.addEventListener('click', async () => {
+    const file = mediaFileInput?.files?.[0];
+    if (file) {
+      try {
+        uploadProgressBar?.classList.remove('hidden');
+        uploadMediaButton.disabled = true;
+        const result = await uploadToR2(file, updateProgress);
+        console.log('Media uploaded successfully:', result);
+        
+        // Keep the preview visible
+        mediaPreview?.classList.remove('hidden');
+        
+        // Hide upload controls
+        uploadControls?.classList.add('hidden');
+      } catch (error) {
+        console.error('Failed to upload media:', error);
+        alert('Failed to upload media. Please try again.');
+      } finally {
+        uploadProgressBar?.classList.add('hidden');
+        if (uploadProgressBarFill) uploadProgressBarFill.style.width = '0%';
+      }
+    } else {
+      alert('Please select a file to upload.');
+    }
+  });
+
+  function updateProgress(progress: number) {
+    if (uploadProgressBarFill) {
+      uploadProgressBarFill.style.width = `${progress}%`;
+    }
+  }
+
+  // Add event listener for closing the settings panel
+  const closeSettingsButton = document.getElementById('closeSettings');
+  closeSettingsButton?.addEventListener('click', () => {
+    settingsPanel?.classList.add('translate-x-full');
+    editorSection?.classList.remove('hidden');
+  });
 </script>
 
 <style>
   /* Add these styles for a cleaner look */
-  input, textarea {
-    @apply text-gray-900 placeholder-gray-400;
+  input, textarea, select {
+    @apply text-gray-900 placeholder-gray-400 border-gray-300 rounded-md;
+    transition: border-color 0.2s ease-in-out;
   }
 
-  input:focus, textarea:focus {
-    @apply ring-2 ring-indigo-500 border-indigo-500;
+  input:focus, textarea:focus, select:focus {
+    @apply outline-none border-indigo-500;
+    box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.2);
+  }
+
+  /* Specific style for the title input */
+  #title {
+    @apply text-4xl font-bold border-none;
+  }
+
+  #title:focus {
+    @apply outline-none;
+    box-shadow: none;
   }
 
   /* EditorJS styles */
   #editorjs {
-    @apply max-w-none;
+    @apply max-w-none px-0;
+    min-height: 300px;
+    height: 100%;
   }
 
   /* Add custom styles for Editor.js to ensure consistent left alignment */
-  :global(.ce-block__content) {
-    max-width: none;
-    margin-left: 0;
-  }
-
+  :global(.ce-block__content),
   :global(.ce-toolbar__content) {
     max-width: none;
+    margin-left: 0;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   /* Additional styles for better text formatting */
@@ -382,5 +611,70 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
 
   #imagePreview:hover {
     opacity: 0.8;
+  }
+
+  /* Simplify toggle button styles */
+  #toggleSettings {
+    @apply bg-gray-200;
+  }
+
+  #toggleSettings:hover {
+    @apply bg-gray-300;
+  }
+
+  /* Hide toggle button on desktop */
+  @media (min-width: 768px) {
+    #toggleSettings {
+      display: none;
+    }
+  }
+
+  #mediaPreview {
+    transition: all 0.3s ease;
+  }
+
+  #mediaPreview:hover {
+    opacity: 0.9;
+  }
+
+  #mediaPreview video,
+  #mediaPreview audio {
+    outline: none;
+  }
+
+  #mediaPreview audio::-webkit-media-controls-panel {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  #mediaPreview audio::-webkit-media-controls-current-time-display,
+  #mediaPreview audio::-webkit-media-controls-time-remaining-display {
+    color: #4a5568;
+  }
+
+  #uploadedCard {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Adjust styles for full-screen editor on mobile and tablet */
+  @media (max-width: 767px) {
+    #editorjs {
+      min-height: calc(100vh - 120px); /* Adjust based on your header height */
+    }
+  }
+
+  /* Settings panel styles */
+  #settingsPanel {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  @media (max-width: 767px) {
+    #settingsPanel {
+      width: 100%;
+    }
   }
 </style>
