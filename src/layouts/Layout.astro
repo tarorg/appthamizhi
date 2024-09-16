@@ -17,10 +17,24 @@ const { title } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body class="bg-gray-100 text-gray-900">
+	<body class="bg-white text-gray-900">
 		<slot />
 	</body>
 </html>
 <style is:global>
-	/* ... (keep existing styles) ... */
+	:root {
+		--accent: 79, 70, 229;
+		--accent-light: 224, 231, 255;
+		--accent-dark: 23, 37, 84;
+		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), rgb(var(--accent-light)) 30%, white 60%);
+	}
+	html {
+		font-family: system-ui, sans-serif;
+		background: #ffffff;
+		background-size: 224px;
+	}
+	code {
+		font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+			Bitstream Vera Sans Mono, Courier New, monospace;
+	}
 </style>

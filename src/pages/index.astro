@@ -2,18 +2,47 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Feed from '../components/Feed.astro';
-import AIChat from '../components/AIChat.astro';
+import Thamizhi from '../components/Thamizhi.astro';
 import Collections from '../components/Collections.astro';
 ---
 
 <Layout title="Journalism App">
   <Header />
   <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <Feed />
-    <AIChat />
-    <Collections />
+    <div id="content">
+      <Feed />
+      <Thamizhi />
+      <Collections />
+    </div>
   </main>
 </Layout>
+
+<script>
+  const menuItems = document.querySelectorAll('.menu-item');
+  const contentSections = document.querySelectorAll('main > div > section');
+
+  menuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = item.getAttribute('href')?.substring(1) || '';
+      
+      menuItems.forEach(mi => mi.classList.remove('active'));
+      item.classList.add('active');
+
+      contentSections.forEach(section => {
+        if (section instanceof HTMLElement) {
+          section.style.display = section.id === targetId ? 'block' : 'none';
+        }
+      });
+    });
+  });
+
+  // Show Feed by default
+  const feedSection = document.getElementById('feed');
+  if (feedSection instanceof HTMLElement) {
+    feedSection.style.display = 'block';
+  }
+</script>
 
 <style>
   main {
@@ -21,7 +50,7 @@ import Collections from '../components/Collections.astro';
     padding: 1rem;
     width: 100%;
     max-width: 1200px;
-    color: white;
+    color: #333;
     font-size: 20px;
     line-height: 1.6;
   }
