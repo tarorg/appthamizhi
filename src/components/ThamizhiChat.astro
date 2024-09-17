@@ -34,10 +34,15 @@ const apiKey = import.meta.env.GROQ_API_KEY;
       <input
         type="text"
         id="chat-input"
-        class="flex-1 p-2 border border-gray-300 rounded-lg"
+        class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         placeholder="Type your message..."
       />
-      <button id="send-button" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Send</button>
+      <button id="send-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+        </svg>
+        Send
+      </button>
     </div>
   </div>
 </div>
@@ -84,9 +89,10 @@ const apiKey = import.meta.env.GROQ_API_KEY;
       const data = await response.json();
       console.log('Response data:', data);
       addMessage(data.reply, 'assistant');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error:', error);
-      addMessage(`An error occurred. Please try again. Details: ${error.message}`, 'error');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      addMessage(`An error occurred. Please try again. Details: ${errorMessage}`, 'error');
     }
   }
 

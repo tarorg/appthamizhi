@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add these styles to your existing global.css file */
+body.dark {
+  background-color: #1a202c;
+  color: #e2e8f0;
+}
+
+body.dark .bg-white {
+  background-color: #2d3748;
+}
+
+body.dark .text-gray-900 {
+  color: #e2e8f0;
+}
+
+body.dark .border-gray-200 {
+  border-color: #4a5568;
+}

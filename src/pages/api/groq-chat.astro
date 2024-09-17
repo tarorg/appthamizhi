@@ -5,7 +5,7 @@ export const prerender = false;
 
 const groq = new Groq({ apiKey: import.meta.env.GROQ_API_KEY });
 
-async function getGroqChatCompletion(messages) {
+async function getGroqChatCompletion(messages: any[]) {
   return groq.chat.completions.create({
     messages: messages,
     model: "llama3-8b-8192",

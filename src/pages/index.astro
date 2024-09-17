@@ -8,40 +8,50 @@ import ThamizhiChat from '../components/ThamizhiChat.astro';
 
 <Layout title="Journalism App">
   <Header />
-  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-64px)]"> <!-- Adjust 64px based on your header height -->
+  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 h-[calc(100vh-64px)]">
     <div id="content" class="relative h-full">
-      <Feed />
-      <ThamizhiChat />
-      <Collections />
+      <div id="feed-section"><Feed /></div>
+      <div id="thamizhi-section" class="hidden"><ThamizhiChat /></div>
+      <div id="collections-section" class="hidden"><Collections /></div>
     </div>
   </main>
 </Layout>
 
 <script>
-  const menuItems = document.querySelectorAll('.menu-item');
-  const contentSections = document.querySelectorAll('#content > *');
+  function showSection(sectionId: string) {
+    document.querySelectorAll('#content > div').forEach(section => {
+      section.classList.add('hidden');
+    });
+    document.getElementById(sectionId)?.classList.remove('hidden');
+  }
 
-  menuItems.forEach(item => {
+  function handleHashChange() {
+    const hash = window.location.hash;
+    switch (hash) {
+      case '#thamizhi':
+        showSection('thamizhi-section');
+        break;
+      case '#collections':
+        showSection('collections-section');
+        break;
+      default:
+        showSection('feed-section');
+    }
+  }
+
+  window.addEventListener('hashchange', handleHashChange);
+  handleHashChange(); // Call once to set initial state
+
+  // Add click event listeners to navigation items
+  document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
-      const targetId = item.getAttribute('href')?.substring(1) || '';
-      
-      menuItems.forEach(mi => mi.classList.remove('active'));
-      item.classList.add('active');
-
-      contentSections.forEach(section => {
-        if (section instanceof HTMLElement) {
-          section.style.display = section.id === targetId ? 'block' : 'none';
-        }
-      });
+      const href = item.getAttribute('href');
+      if (href) {
+        window.location.hash = href.replace('/#', '');
+      }
     });
   });
-
-  // Show Feed by default
-  const feedSection = document.getElementById('feed');
-  if (feedSection instanceof HTMLElement) {
-    feedSection.style.display = 'block';
-  }
 </script>
 
 <style>
