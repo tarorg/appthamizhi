@@ -18,6 +18,7 @@ export default defineConfig({
       'import.meta.env.PUBLIC_R2_SECRET_ACCESS_KEY': JSON.stringify(process.env.PUBLIC_R2_SECRET_ACCESS_KEY),
       'import.meta.env.PUBLIC_R2_BUCKET_NAME': JSON.stringify(process.env.PUBLIC_R2_BUCKET_NAME),
       'import.meta.env.PUBLIC_R2_DOMAIN': JSON.stringify(process.env.PUBLIC_R2_DOMAIN),
+      'import.meta.env.GROQ_API_KEY': JSON.stringify(process.env.GROQ_API_KEY),
     },
   }
 });
