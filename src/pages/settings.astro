@@ -4,47 +4,35 @@ import Header from '../components/Header.astro';
 import { NhostClient } from '@nhost/nhost-js';
 
 const nhost = new NhostClient({
-  subdomain: 'vpgocetcazniqixfdeje',
-  region: 'ap-southeast-1'
+  subdomain: import.meta.env.PUBLIC_NHOST_SUBDOMAIN,
+  region: import.meta.env.PUBLIC_NHOST_REGION
 });
+
+// We'll fetch user data client-side to ensure we have the latest session
+let userData = null;
+let authError = null;
 ---
 
 <Layout title="Settings - Journalism App">
   <Header />
-  <main class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div class="px-4 py-5 sm:px-6">
-        <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-          Settings
-        </h1>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">
-          Manage your account and preferences
-        </p>
+  <main class="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-6">Settings</h1>
+    <div id="user-data-container" class="space-y-8">
+      <p class="text-gray-500">Loading user data...</p>
+    </div>
+    
+    <div class="space-y-8 mt-8">
+      <div>
+        <h2 class="text-lg font-medium text-gray-900 mb-2">Preferences</h2>
+        <button id="theme-toggle" class="text-sm text-gray-700 hover:text-gray-900">
+          Toggle Dark Mode
+        </button>
       </div>
-      <div class="border-t border-gray-200">
-        <dl>
-          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500">
-              Theme
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <button id="theme-toggle" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200">
-                Toggle Dark Mode
-              </button>
-            </dd>
-          </div>
-          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500">
-              Account
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <button id="sign-out" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200">
-                Sign Out
-              </button>
-            </dd>
-          </div>
-          <!-- Add more settings options here -->
-        </dl>
+      
+      <div>
+        <button id="sign-out" class="text-sm text-red-600 hover:text-red-800">
+          Sign Out
+        </button>
       </div>
     </div>
   </main>
@@ -53,14 +41,75 @@ const nhost = new NhostClient({
 <script>
   import { NhostClient } from '@nhost/nhost-js';
 
-  const themeToggle = document.getElementById('theme-toggle');
-  const signOutButton = document.getElementById('sign-out');
   const nhost = new NhostClient({
-    subdomain: 'vpgocetcazniqixfdeje',
-    region: 'ap-southeast-1'
+    subdomain: import.meta.env.PUBLIC_NHOST_SUBDOMAIN,
+    region: import.meta.env.PUBLIC_NHOST_REGION
   });
 
+  async function fetchUserData() {
+    try {
+      const isAuthenticated = await nhost.auth.isAuthenticatedAsync();
+      console.log('Is authenticated:', isAuthenticated);
+      
+      if (isAuthenticated) {
+        const user = await nhost.auth.getUser();
+        console.log('Raw user data:', user);
+        
+        if (user) {
+          const userData = {
+            id: user.id,
+            email: user.email,
+            displayName: user.displayName || user.email.split('@')[0],
+            avatarUrl: user.avatarUrl || `https://www.gravatar.com/avatar/${user.id}?d=identicon&s=200`,
+            createdAt: user.createdAt,
+          };
+          console.log('Processed user data:', userData);
+          return userData;
+        } else {
+          console.log('User data is null');
+          return null;
+        }
+      } else {
+        console.log('User is not authenticated');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
+    }
+  }
+
+  async function updateUserDataDisplay() {
+    const container = document.getElementById('user-data-container');
+    if (!container) return;
+
+    try {
+      const userData = await fetchUserData();
+      if (userData) {
+        container.innerHTML = `
+          <div>
+            <p class="font-medium text-lg">${userData.displayName}</p>
+            <p class="text-gray-500 text-sm">${userData.email}</p>
+          </div>
+        `;
+        // Update profile icon in header
+        const profileIcon = document.getElementById('profile-icon');
+        if (profileIcon) {
+          profileIcon.innerHTML = `<img src="${userData.avatarUrl}" alt="Profile" class="w-8 h-8 rounded-full">`;
+        }
+      } else {
+        container.innerHTML = '<p class="text-gray-500">Not logged in or unable to fetch user data</p>';
+      }
+    } catch (error) {
+      container.innerHTML = `<p class="text-red-500">Error: ${error instanceof Error ? error.message : String(error)}</p>`;
+    }
+  }
+
+  // Call this function when the page loads
+  updateUserDataDisplay();
+
   // Theme toggle functionality
+  const themeToggle = document.getElementById('theme-toggle');
   themeToggle?.addEventListener('click', () => {
     document.body.classList.toggle('dark');
     localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
@@ -74,10 +123,11 @@ const nhost = new NhostClient({
   }
 
   // Sign out functionality
+  const signOutButton = document.getElementById('sign-out');
   signOutButton?.addEventListener('click', async () => {
     try {
       await nhost.auth.signOut();
-      window.location.href = '/'; // Redirect to home page after sign out
+      window.location.href = '/';
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -90,15 +140,4 @@ const nhost = new NhostClient({
     document.body.classList.remove('dark');
   }
   updateThemeButtonText();
-
-  // Add navigation functionality
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const href = item.getAttribute('href');
-      if (href) {
-        window.location.href = href;
-      }
-    });
-  });
 </script>
