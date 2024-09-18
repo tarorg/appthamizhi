@@ -302,24 +302,27 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
       const filename = `${Date.now()}-${file.name}`;
       console.log('Uploading file:', filename);
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('filename', filename);
-      formData.append('contentType', file.type);
-
-      console.log('FormData:', Object.fromEntries(formData.entries()));
-
-      const response = await fetch('/api/test', {
-        method: 'POST',
-        body: formData,
+      // Create the JSON payload
+      const payload = JSON.stringify({
+        filename: filename,
+        contentType: file.type
       });
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to get signed URL: ${response.status} ${response.statusText}. Error: ${errorText}`);
+      }
 
       const responseData = await response.json();
       console.log('API response:', responseData);
-
-      if (!response.ok) {
-        throw new Error(`Failed to get signed URL: ${responseData.error || response.statusText}`);
-      }
 
       const { signedUrl, publicUrl } = responseData;
       console.log('Received signed URL:', signedUrl);

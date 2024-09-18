@@ -13,7 +13,7 @@ const S3 = new S3Client({
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await Astro.request.text();
+    const body = await request.text(); // Fixed: Use request instead of Astro.request
     console.log('Received raw request body:', body);
 
     let parsedBody;
