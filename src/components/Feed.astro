@@ -24,7 +24,7 @@ interface MastodonPost {
 }
 
 const accessToken = import.meta.env.PUBLIC_MASTODON_ACCESS_TOKEN;
-const apiUrl = 'https://thamizhi.xyz/api/v1/timelines/public?local=true';
+const apiUrl = 'https://thamizhi.xyz/api/v1/timelines/public?local=true&limit=40';
 
 let posts: MastodonPost[] = [];
 let error: string | null = null;
@@ -40,8 +40,12 @@ try {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  posts = await response.json();
-  posts = posts.filter(post => (!post.account.acct.includes('@') || post.account.acct.endsWith('@thamizhi.xyz')) && !post.in_reply_to_id);
+  const allPosts = await response.json();
+  console.log(`Received ${allPosts.length} posts from API`);
+  
+  posts = allPosts.filter(post => !post.in_reply_to_id);
+  
+  console.log(`After filtering out replies: ${posts.length} posts`);
 } catch (e) {
   console.error('Error fetching posts:', e);
   error = 'Failed to load posts. Please try again later.';

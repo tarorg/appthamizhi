@@ -6,113 +6,149 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
 ---
 
 <Layout title="Create Post">
-  <div class="flex h-screen bg-white">
-    <!-- Editor Section -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <header class="py-4 px-6 border-b flex justify-between items-center">
-        <input type="text" name="title" id="title" placeholder="Post Title" class="w-full text-4xl font-bold border-none focus:ring-0 focus:outline-none" />
-        <button id="toggleSettings" class="md:hidden bg-gray-200 p-2 rounded-md shadow-md">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
-      </header>
-      
+  <div class="flex h-screen bg-gray-100">
+    <!-- Left Panel -->
+    <aside class="w-64 bg-white border-r flex flex-col">
       <div class="flex-1 overflow-y-auto">
-        <!-- Media Section -->
-        <div class="px-6 pt-4">
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Media</h3>
-          <div id="mediaUploadArea" class="w-full aspect-video bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            <p class="text-sm text-gray-500">Drag and drop your media here, or <span class="text-indigo-600 font-medium">browse</span></p>
-            <p class="text-xs text-gray-400 mt-1">Supports video, audio, and PDF files</p>
-          </div>
-          <input type="file" name="media-file" id="media-file" accept="video/*,audio/*,application/pdf" class="hidden">
-          <div id="mediaPreview" class="mt-4 hidden w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"></div>
-          <div id="uploadControls" class="flex items-center justify-between mt-4">
-            <span id="selected-file" class="text-sm text-gray-500">No file selected</span>
-            <button id="upload-media" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-              Upload
-            </button>
-          </div>
-          <!-- Progress bar -->
-          <div id="upload-progress" class="w-full bg-gray-200 rounded-full h-2 mt-4 hidden">
-            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
-          </div>
+        <!-- Update the post title input in the Left Panel -->
+        <div class="p-4">
+          <textarea
+            name="title"
+            id="title"
+            placeholder="Post Title"
+            class="w-full text-xl font-bold border-none focus:ring-0 focus:outline-none resize-none overflow-hidden"
+            rows="1"
+          ></textarea>
         </div>
-
-        <div class="px-6 pt-4 text-sm text-gray-500 font-medium">Notes</div>
-        <div id="editorjs" class="px-6 py-2"></div>
-      </div>
-    </div>
-
-    <!-- Settings Panel -->
-    <div id="settingsPanel" class="w-96 bg-gray-100 border-l overflow-y-auto transition-transform duration-300 ease-in-out transform md:translate-x-0 translate-x-full fixed top-0 right-0 bottom-0 z-50 md:relative">
-      <div class="p-6 space-y-6">
-        <div class="flex justify-between items-center">
-          <h2 class="text-lg font-semibold text-gray-900">Settings</h2>
-          <button id="closeSettings" class="md:hidden text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+        <nav class="p-4 space-y-2">
+          <button class="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="mediaBtn">
+            Media
           </button>
-        </div>
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Feature Image</h3>
-          <div id="imagePreview" class="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center mb-2 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <input type="file" name="feature-image" id="feature-image" accept="image/*" class="hidden">
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Publish</h3>
-          <input type="datetime-local" name="datetime" id="datetime" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Authors</h3>
-          <input type="text" name="authors" id="authors" placeholder="Add authors" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Collection</h3>
-          <select name="collection" id="collection" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="">Select a collection</option>
-            {collections.map((collection) => (
-              <option value={collection}>{collection}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Location</h3>
-          <input type="text" name="location" id="location" placeholder="Add location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Tags</h3>
-          <input type="text" name="tags" id="tags" placeholder="Add tags" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">Excerpt</h3>
-          <textarea name="excerpt" id="excerpt" rows="3" placeholder="Write a short excerpt" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-        </div>
-
-        <div>
-          <h3 class="text-sm uppercase text-gray-500 font-semibold mb-2">SEO Description</h3>
-          <textarea name="metadata" id="metadata" rows="3" placeholder="SEO description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-        </div>
-
-        <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <button class="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="notesBtn">
+            Notes
+          </button>
+          <button class="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="logsBtn">
+            Logs
+          </button>
+          <button class="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="metadataBtn">
+            Metadata
+          </button>
+        </nav>
+      </div>
+      <div class="p-4 border-t">
+        <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           Publish
         </button>
+      </div>
+    </aside>
+
+    <!-- Right Panel -->
+    <div class="flex-1 overflow-hidden">
+      <!-- Media Content -->
+      <div id="mediaContent" class="h-full overflow-y-auto p-6 bg-white hidden">
+        <h2 class="text-2xl font-bold mb-4">Media Upload</h2>
+        <div id="mediaUploadArea" class="w-full aspect-video bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <p class="text-sm text-gray-500">Drag and drop your media here, or <span class="text-indigo-600 font-medium">browse</span></p>
+          <p class="text-xs text-gray-400 mt-1">Supports video, audio, and PDF files</p>
+        </div>
+        <input type="file" name="media-file" id="media-file" accept="video/*,audio/*,application/pdf" class="hidden">
+        <div id="mediaPreview" class="mt-4 hidden w-full aspect-video bg-gray-100 rounded-lg overflow-hidden"></div>
+        <div id="uploadControls" class="flex items-center justify-between mt-4">
+          <span id="selected-file" class="text-sm text-gray-500">No file selected</span>
+          <button id="upload-media" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Upload
+          </button>
+        </div>
+        <div id="upload-progress" class="w-full bg-gray-200 rounded-full h-2 mt-4 hidden">
+          <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-in-out" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Notes Content -->
+      <div id="notesContent" class="h-full overflow-y-auto bg-white hidden">
+        <h2 class="text-2xl font-bold mb-6 px-10 pt-10">Notes</h2>
+        <div id="editorjs" class="bg-white px-10 pb-10"></div>
+      </div>
+
+      <!-- Logs Content -->
+      <div id="logsContent" class="h-full overflow-y-auto p-6 bg-white hidden">
+        <h2 class="text-2xl font-bold mb-4">Logs</h2>
+        <div id="logEntries" class="space-y-2 mb-4">
+          <!-- Log entries will be dynamically added here -->
+        </div>
+        <button id="addLogBtn" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Add Log
+        </button>
+      </div>
+
+      <!-- Metadata Content -->
+      <div id="metadataContent" class="h-full overflow-y-auto p-6 bg-white hidden">
+        <h2 class="text-2xl font-bold mb-4">Metadata</h2>
+        <div class="space-y-6">
+          <!-- Feature Image -->
+          <div>
+            <label for="feature-image" class="block text-sm font-medium text-gray-700">Feature Image</label>
+            <div id="imagePreview" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div class="space-y-1 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172 9.172a4 4 0 01-5.656 5.656L8 32m24 0l4 4m0-24l-4 4m16 4l-4 4m0-12l4 4m-4-4l4 4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="flex text-sm text-gray-600">
+                  <label for="feature-image" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                    <span>Upload a file</span>
+                    <input id="feature-image" name="feature-image" type="file" class="sr-only">
+                  </label>
+                  <p class="pl-1">or drag and drop</p>
+                </div>
+                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Other metadata fields -->
+          <div>
+            <label for="datetime" class="block text-sm font-medium text-gray-700">Publish Date and Time</label>
+            <input type="datetime-local" name="datetime" id="datetime" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+
+          <div>
+            <label for="authors" class="block text-sm font-medium text-gray-700">Authors</label>
+            <input type="text" name="authors" id="authors" placeholder="Add authors" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+
+          <div>
+            <label for="collection" class="block text-sm font-medium text-gray-700">Collection</label>
+            <select id="collection" name="collection" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+              <option value="">Select a collection</option>
+              {collections.map((collection) => (
+                <option value={collection}>{collection}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+            <input type="text" name="location" id="location" placeholder="Add location" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+
+          <div>
+            <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+            <input type="text" name="tags" id="tags" placeholder="Add tags" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          </div>
+
+          <div>
+            <label for="excerpt" class="block text-sm font-medium text-gray-700">Excerpt</label>
+            <textarea name="excerpt" id="excerpt" rows="3" placeholder="Write a short excerpt" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+          </div>
+
+          <div>
+            <label for="metadata" class="block text-sm font-medium text-gray-700">SEO Description</label>
+            <textarea name="metadata" id="metadata" rows="3" placeholder="SEO description" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -137,12 +173,11 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
   const editor = new EditorJS({
     holder: 'editorjs',
     placeholder: 'Start writing your post...',
-    minHeight: 0, // This allows the editor to shrink when empty
+    minHeight: 0,
     tools: {
       header: {
         class: Header,
         config: {
-          placeholder: 'Enter a header',
           levels: [1, 2, 3, 4, 5, 6],
           defaultLevel: 3,
           shortcut: 'CMD+SHIFT+H'
@@ -367,36 +402,6 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
     }
   }
 
-  // Modify the toggle functionality
-  const toggleButton = document.getElementById('toggleSettings');
-  const closeButton = document.getElementById('closeSettings');
-  const settingsPanel = document.getElementById('settingsPanel');
-  const editorSection = document.querySelector('.flex-1.flex.flex-col.overflow-hidden');
-
-  function togglePanel() {
-    settingsPanel?.classList.toggle('translate-x-full');
-    if (window.innerWidth < 768) { // md breakpoint
-      editorSection?.classList.toggle('hidden');
-    }
-  }
-
-  toggleButton?.addEventListener('click', togglePanel);
-  closeButton?.addEventListener('click', togglePanel);
-
-  // Handle resize
-  function handleResize() {
-    if (window.innerWidth >= 768) { // md breakpoint
-      settingsPanel?.classList.remove('translate-x-full');
-      editorSection?.classList.remove('hidden');
-    } else {
-      settingsPanel?.classList.add('translate-x-full');
-      editorSection?.classList.remove('hidden');
-    }
-  }
-
-  window.addEventListener('resize', handleResize);
-  handleResize(); // Initial call
-
   // Media file handling
   const mediaUploadArea = document.getElementById('mediaUploadArea');
   const mediaFileInput = document.getElementById('media-file') as HTMLInputElement;
@@ -533,151 +538,153 @@ const collections = ['Genocide', 'Nature', 'Politics', 'Technology', 'Culture'];
     }
   }
 
-  // Add event listener for closing the settings panel
-  const closeSettingsButton = document.getElementById('closeSettings');
-  closeSettingsButton?.addEventListener('click', () => {
-    settingsPanel?.classList.add('translate-x-full');
-    editorSection?.classList.remove('hidden');
+  // Handle left panel button clicks
+  const mediaBtn = document.getElementById('mediaBtn');
+  const notesBtn = document.getElementById('notesBtn');
+  const logsBtn = document.getElementById('logsBtn');
+  const metadataBtn = document.getElementById('metadataBtn');
+  const mediaContent = document.getElementById('mediaContent');
+  const notesContent = document.getElementById('notesContent');
+  const logsContent = document.getElementById('logsContent');
+  const metadataContent = document.getElementById('metadataContent');
+
+  function showContent(content: HTMLElement | null) {
+    [mediaContent, notesContent, logsContent, metadataContent].forEach(el => el?.classList.add('hidden'));
+    content?.classList.remove('hidden');
+  }
+
+  mediaBtn?.addEventListener('click', () => showContent(mediaContent));
+  notesBtn?.addEventListener('click', () => showContent(notesContent));
+  logsBtn?.addEventListener('click', () => showContent(logsContent));
+  metadataBtn?.addEventListener('click', () => showContent(metadataContent));
+
+  // Logs functionality
+  const addLogBtn = document.getElementById('addLogBtn');
+  const logEntries = document.getElementById('logEntries');
+
+  addLogBtn?.addEventListener('click', () => {
+    const logEntry = document.createElement('div');
+    logEntry.className = 'p-2 bg-gray-100 rounded';
+    logEntry.textContent = `Log entry ${logEntries?.children?.length ? logEntries.children.length + 1 : 1}`;
+    logEntries?.appendChild(logEntry);
+  });
+
+  // Show Notes content by default
+  showContent(notesContent);
+
+  // Add this to handle the auto-expanding textarea for the title
+  const titleTextarea = document.getElementById('title') as HTMLTextAreaElement;
+  titleTextarea?.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
   });
 </script>
 
 <style>
-  /* Add these styles for a cleaner look */
-  input, textarea, select {
-    @apply text-gray-900 placeholder-gray-400 border-gray-300 rounded-md;
-    transition: border-color 0.2s ease-in-out;
-  }
+  /* ... (rest of the styles remain unchanged) ... */
 
-  input:focus, textarea:focus, select:focus {
-    @apply outline-none border-indigo-500;
-    box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.2);
-  }
-
-  /* Specific style for the title input */
-  #title {
-    @apply text-4xl font-bold border-none;
-  }
-
-  #title:focus {
-    @apply outline-none;
-    box-shadow: none;
+  /* Remove border from EditorJS container */
+  #editorjs {
+    @apply border-none;
   }
 
   /* EditorJS styles */
   #editorjs {
-    @apply max-w-none px-0;
+    @apply max-w-none;
     min-height: 300px;
-    height: 100%;
+    padding-bottom: 100px; /* Increase padding at the bottom */
   }
 
-  /* Add custom styles for Editor.js to ensure consistent left alignment */
+  /* Add custom styles for Editor.js to ensure consistent alignment with more padding */
   :global(.ce-block__content),
   :global(.ce-toolbar__content) {
     max-width: none;
     margin-left: 0;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: 40px; /* Set to 40px */
+    padding-right: 40px; /* Set to 40px */
   }
 
-  /* Additional styles for better text formatting */
-  :global(.ce-block__content h1) {
-    @apply text-3xl font-bold mb-4;
+  /* Adjust the toolbar position */
+  :global(.ce-toolbar__plus) {
+    left: 0px; /* Align with the new padding */
   }
 
-  :global(.ce-block__content h2) {
-    @apply text-2xl font-bold mb-3;
+  :global(.ce-toolbar__actions) {
+    right: 0px; /* Align with the new padding */
   }
 
-  :global(.ce-block__content h3) {
-    @apply text-xl font-bold mb-2;
+  /* Add spacing between blocks in the editor */
+  :global(.ce-block:not(:last-child)) {
+    margin-bottom: 1.5em;
   }
 
-  :global(.ce-block__content p) {
-    @apply mb-4;
+  /* Style for the multiline title input */
+  #title {
+    resize: none;
+    overflow: hidden;
+    min-height: 1.5em;
+    line-height: 1.5;
   }
 
-  :global(.ce-block__content ul, .ce-block__content ol) {
-    @apply mb-4 pl-5;
+  /* Add these new styles */
+  .container {
+    max-width: 1200px;
   }
 
-  :global(.ce-block__content li) {
-    @apply mb-1;
+  #editorjs {
+    min-height: 300px;
   }
 
-  :global(.ce-block__content blockquote) {
-    @apply border-l-4 border-gray-300 pl-4 italic my-4;
+  /* Adjust input and select styles for consistency */
+  input[type="text"],
+  input[type="datetime-local"],
+  select,
+  textarea {
+    @apply mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
   }
 
-  #imagePreview {
-    transition: all 0.3s ease;
+  /* Style the EditorJS container */
+  #editorjs {
+    @apply border border-gray-300 rounded-md p-4;
   }
 
-  #imagePreview:hover {
-    opacity: 0.8;
+  /* Remove border from EditorJS container */
+  #editorjs {
+    @apply border-none p-0;
   }
 
-  /* Simplify toggle button styles */
-  #toggleSettings {
-    @apply bg-gray-200;
+  /* Styles for EditorJS headings */
+  :global(.ce-header) {
+    padding: 0.5em 0;
   }
 
-  #toggleSettings:hover {
-    @apply bg-gray-300;
+  :global(h1.ce-header) {
+    font-size: 2.5em;
+    font-weight: bold;
   }
 
-  /* Hide toggle button on desktop */
-  @media (min-width: 768px) {
-    #toggleSettings {
-      display: none;
-    }
+  :global(h2.ce-header) {
+    font-size: 2em;
+    font-weight: bold;
   }
 
-  #mediaPreview {
-    transition: all 0.3s ease;
+  :global(h3.ce-header) {
+    font-size: 1.75em;
+    font-weight: bold;
   }
 
-  #mediaPreview:hover {
-    opacity: 0.9;
+  :global(h4.ce-header) {
+    font-size: 1.5em;
+    font-weight: bold;
   }
 
-  #mediaPreview video,
-  #mediaPreview audio {
-    outline: none;
+  :global(h5.ce-header) {
+    font-size: 1.25em;
+    font-weight: bold;
   }
 
-  #mediaPreview audio::-webkit-media-controls-panel {
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-
-  #mediaPreview audio::-webkit-media-controls-current-time-display,
-  #mediaPreview audio::-webkit-media-controls-time-remaining-display {
-    color: #4a5568;
-  }
-
-  #uploadedCard {
-    animation: fadeIn 0.5s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Adjust styles for full-screen editor on mobile and tablet */
-  @media (max-width: 767px) {
-    #editorjs {
-      min-height: calc(100vh - 120px); /* Adjust based on your header height */
-    }
-  }
-
-  /* Settings panel styles */
-  #settingsPanel {
-    transition: transform 0.3s ease-in-out;
-  }
-
-  @media (max-width: 767px) {
-    #settingsPanel {
-      width: 100%;
-    }
+  :global(h6.ce-header) {
+    font-size: 1em;
+    font-weight: bold;
   }
 </style>
